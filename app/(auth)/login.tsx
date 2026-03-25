@@ -27,7 +27,8 @@ export default function LoginScreen() {
   };
 
   const handleContinueWithoutAccount = () => {
-    console.log("Continuar sin cuenta");
+    // console.log("Continuar sin cuenta");
+    router.replace("/(tabs)");
   };
 
   const handleForgotPassword = () => {

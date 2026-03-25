@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
     SafeAreaView,
@@ -11,6 +12,7 @@ import {
 import { Colors } from "../../constants/Colors"; // Ajustado según tu captura de archivos
 
 export default function Index() {
+  const router = useRouter();
   // Simulación de los 10 espacios de la imagen
   const parkingSpots = [
     { id: 1, occupied: false }, { id: 6, occupied: true },
@@ -20,6 +22,10 @@ export default function Index() {
     { id: 5, occupied: true },  { id: 10, occupied: false },
   ];
 
+  const handleSpotPress = (id: number) => {
+    // Viaja a la ruta dinámica, pasando el ID en la URL
+    router.push(`/spot/${id}`);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -65,6 +71,7 @@ export default function Index() {
             <TouchableOpacity 
               key={spot.id} 
               activeOpacity={0.7}
+              onPress={() => handleSpotPress(spot.id)}
               style={[
                 styles.spotCard, 
                 { borderColor: spot.occupied ? Colors.danger : "#10B981" }
