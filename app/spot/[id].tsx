@@ -24,7 +24,10 @@ interface SpotInfo {
 
 export default function SpotDetailScreen() {
   // 1. Recepción de parámetros: Capturamos el ID del cajón que viene en la ruta
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, occupied } = useLocalSearchParams<{
+    id: string;
+    occupied: string;
+  }>();
   const router = useRouter();
 
   // 2. Uso de Hooks (useState): Para manejar los datos y el estado de carga
@@ -38,7 +41,7 @@ export default function SpotDetailScreen() {
         setSpot({
           id: id || "1",
           name: `Sitio ${id || "1"}`,
-          status: "available",
+          status: occupied === "true" ? "occupied" : "available",
           location: "Sección A, Nivel 1",
           rate: "$25.00/hora",
         });
@@ -47,14 +50,16 @@ export default function SpotDetailScreen() {
     };
 
     fetchSpotData();
-  }, [id]);
+  }, [id, occupied]);
 
   // Pantalla de carga mientras se obtienen los datos
   if (loading || !spot) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Cargando información del sitio...</Text>
+        <Text style={styles.loadingText}>
+          Cargando información del sitio...
+        </Text>
       </SafeAreaView>
     );
   }
@@ -81,12 +86,24 @@ export default function SpotDetailScreen() {
           {/* Fila de tarjetas (Ubicación y Tarifa) */}
           <View style={styles.cardsRow}>
             <InfoCard
-              icon={<Ionicons name="location-outline" size={20} color={Colors.primary} />}
+              icon={
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
               title="UBICACIÓN"
               value={spot.location}
             />
             <InfoCard
-              icon={<Ionicons name="cash-outline" size={20} color={Colors.primary} />}
+              icon={
+                <Ionicons
+                  name="cash-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
+              }
               title="TARIFA"
               value={spot.rate}
             />
@@ -131,7 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
-    overflow: "hidden", 
+    overflow: "hidden",
     position: "relative",
   },
   watermark: {
@@ -141,7 +158,7 @@ const styles = StyleSheet.create({
     fontSize: 140,
     fontWeight: "900",
     color: Colors.surface,
-    opacity: 0.1, 
+    opacity: 0.1,
   },
   mainCardTitle: {
     fontSize: 40,
@@ -156,12 +173,12 @@ const styles = StyleSheet.create({
   cardsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginHorizontal: -6, 
+    marginHorizontal: -6,
     marginBottom: 24,
   },
   mapContainer: {
     height: 200,
-    backgroundColor: "#E2E8F0", 
+    backgroundColor: "#E2E8F0",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
