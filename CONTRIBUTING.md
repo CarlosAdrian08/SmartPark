@@ -11,12 +11,12 @@
 ```
 main          ←  Producción / entregas finales al profesor
   └── develop ←  Integración continua entre sprints
-        ├── carlos     ← Autenticación
-        ├── felipe     ← Home + Detalle spot
+        ├── ruben      ← Home
         ├── aldair     ← Pantalla información
+        ├── cristian   ← Autenticación
+        ├── santiago   ← Perfil + UI base
         ├── jhonatan   ← Historial
-        ├── ruben      ← Mapa
-        └── cristian   ← Perfil + UI base
+        └── carlos     ← informacion Estacionamiento + Recuperacion Contraseña
 ```
 
 ### Flujo por sprint (cada 2 semanas)
