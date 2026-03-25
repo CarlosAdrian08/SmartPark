@@ -1,13 +1,17 @@
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const HeaderSecondary = ({ title }: { title: string }) => {
+  const router = useRouter();
+
   return (
     <View style={styles.header}>
       <TouchableOpacity
-        onPress={() => console.log("Volver")}
+        // onPress={() => console.log("Volver")}
+        onPress={() => router.back()}
         style={{ padding: 4 }}
       >
         <Ionicons name="arrow-back" size={24} color={Colors.textSecondary} />
