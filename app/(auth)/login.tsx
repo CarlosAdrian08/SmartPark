@@ -15,19 +15,43 @@ import {
   View,
 } from "react-native";
 
+import { useAuth } from "@/hooks/useAuth"; // Importamos el hook de autenticación
+import { Alert } from "react-native"; // Para mostrar errores de forma sencilla
+
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { signIn, enterAsGuest } = useAuth(); // Extraemos la función de inicio de sesión
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Estado local para el feedback del botón
 
-  const handleLogin = () => {
-    console.log("Iniciar sesión", { email, password });
+  const handleLogin = async () => {
+    // 1. Validación básica
+    if (!email || !password) {
+      Alert.alert("Error", "Por favor, ingresa tu correo y contraseña.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 2. Llamada al servicio a través del hook
+      await signIn(email, password);
+    } catch (error: any) {
+      // 4. Manejo de errores (credenciales incorrectas, falta de red, etc.)
+      Alert.alert(
+        "Error de inicio de sesión",
+        error.message || "Credenciales inválidas",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleContinueWithoutAccount = () => {
-    // console.log("Continuar sin cuenta");
+    enterAsGuest();
     router.replace("/(tabs)");
   };
 
@@ -79,6 +103,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 iconName="mail-outline"
+                editable={!loading} // Bloquear mientras carga
               />
 
               <Input
@@ -88,11 +113,13 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 isPassword
                 iconName="lock-closed-outline"
+                editable={!loading} // Bloquear mientras carga
               />
 
               <TouchableOpacity
                 onPress={handleForgotPassword}
                 style={styles.forgotPassword}
+                disabled={loading}
               >
                 <Text style={styles.forgotPasswordText}>
                   ¿Olvidaste tu contraseña?
@@ -100,11 +127,13 @@ export default function LoginScreen() {
               </TouchableOpacity>
 
               <Button
-                title="Iniciar Sesión"
+                title={loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                 onPress={handleLogin}
                 variant="secondary"
                 fullWidth
                 style={styles.loginButton}
+                loading={loading} // Asumiendo que tu componente Button soporta loading
+                disabled={loading}
               />
 
               {/* Divider */}
@@ -122,13 +151,14 @@ export default function LoginScreen() {
                 fullWidth
                 iconName="public"
                 iconColor={Colors.primary}
+                disabled={loading}
               />
             </View>
 
             {/* Footer */}
             <View style={styles.footer}>
               <Text style={styles.footerText}>¿No tienes una cuenta? </Text>
-              <TouchableOpacity onPress={handleRegister}>
+              <TouchableOpacity onPress={handleRegister} disabled={loading}>
                 <Text style={styles.registerLink}>Regístrate</Text>
               </TouchableOpacity>
             </View>
