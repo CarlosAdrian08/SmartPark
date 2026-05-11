@@ -4,15 +4,15 @@ import { Colors } from "@/constants/Colors";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -27,7 +27,8 @@ export default function LoginScreen() {
   };
 
   const handleContinueWithoutAccount = () => {
-    console.log("Continuar sin cuenta");
+    // console.log("Continuar sin cuenta");
+    router.replace("/(tabs)");
   };
 
   const handleForgotPassword = () => {

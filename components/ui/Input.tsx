@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -8,30 +9,36 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constants/Colors";
 
 interface InputProps extends TextInputProps {
-  label?: string;
-  error?: string;
-  iconName?: keyof typeof Ionicons.glyphMap;
-  isPassword?: boolean;
+  label?: string; // Ahora es opcional como el de tu compañero
+  leftIcon?: React.ReactNode; // Mantenemos el tuyo por compatibilidad
+  error?: string; // Extra: para mostrar textos de validación
+  iconName?: keyof typeof Ionicons.glyphMap; // Extra: para pasar directo el nombre del ícono
+  isPassword?: boolean; // Extra: para activar el ojito de ocultar contraseña
 }
 
-const Input = ({
+export default function Input({
   label,
+  leftIcon,
   error,
   iconName,
   isPassword = false,
   style,
   ...props
-}: InputProps) => {
+}: InputProps) {
+  // Estado para manejar si la contraseña se ve o no
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <View style={styles.container}>
+      {/* Etiqueta con tus estilos originales (Teal, Mayúsculas) */}
       {label && <Text style={styles.label}>{label}</Text>}
+
       <View style={[styles.inputContainer, error && styles.inputError]}>
-        {iconName && (
+        {/* Renderiza tu ícono personalizado o el nombre del ícono de tu compañero */}
+        {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
+        {!leftIcon && iconName && (
           <Ionicons
             name={iconName}
             size={20}
@@ -39,12 +46,15 @@ const Input = ({
             style={styles.icon}
           />
         )}
+
         <TextInput
           style={[styles.input, style]}
           placeholderTextColor={Colors.textMuted}
-          secureTextEntry={isPassword && !showPassword}
+          secureTextEntry={isPassword && !showPassword} // Oculta el texto si es contraseña
           {...props}
         />
+
+        {/* Botón del ojito, solo aparece si le pasas isPassword={true} */}
         {isPassword && (
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
@@ -58,51 +68,59 @@ const Input = ({
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Mensaje de error (si existe) */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
+    width: "100%",
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: Colors.textPrimary,
+    // Tus estilos de etiqueta originales
+    fontSize: 12,
+    fontWeight: "bold",
+    color: Colors.primary,
     marginBottom: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   inputContainer: {
+    // Tu contenedor de input original
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: "#E5E7EB",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    minHeight: 48,
   },
   inputError: {
+    // Si hay error, el borde se pone rojo
     borderColor: Colors.danger,
   },
   icon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: Colors.textPrimary,
-    paddingVertical: 12,
   },
   eyeIcon: {
     padding: 4,
+    marginLeft: 8,
   },
   errorText: {
+    // Estilo para el mensaje de error de tu compañero
     fontSize: 12,
     color: Colors.danger,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: "500",
   },
 });
-
-export default Input;
