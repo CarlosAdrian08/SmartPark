@@ -1,17 +1,16 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
 import {
-    ActivityIndicator,
-    GestureResponderEvent,
-    Image,
-    ImageSourcePropType,
-    StyleProp,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    View,
-    ViewStyle,
+  ActivityIndicator,
+  GestureResponderEvent,
+  Image,
+  ImageSourcePropType,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
 

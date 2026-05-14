@@ -3,7 +3,7 @@ import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useRouter } from "expo-router";
 import {
   ScrollView,
   StyleSheet,
@@ -14,10 +14,16 @@ import {
 
 /* Pantalla */
 export default function ProfileScreen() {
+  const router = useRouter();
   // aquí iría useAuth()
   const user = {
     name: "Juan Pérez",
     email: "juan.perez@email.com",
+  };
+
+  const handleLogout = () => {
+    console.log("Cerrando sesión...");
+    router.replace("/(auth)/login");
   };
 
   return (
@@ -46,6 +52,7 @@ export default function ProfileScreen() {
             variant="danger"
             iconName="logout"
             iconColor="red"
+            onPress={handleLogout}
           />
         </Section>
       </ScrollView>

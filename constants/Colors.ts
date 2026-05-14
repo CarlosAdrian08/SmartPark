@@ -7,4 +7,5 @@ export const Colors = {
   textMuted: "#6B7280",
   danger: "#EF4444",
   navy: "#1E3A8A",
+  available: "#22C55E",
 };
