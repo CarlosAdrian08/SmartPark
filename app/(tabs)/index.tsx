@@ -1,29 +1,42 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Colors } from "../../constants/Colors"; // Ajustado según tu captura de archivos
 
 export default function Index() {
+  const router = useRouter();
   // Simulación de los 10 espacios de la imagen
   const parkingSpots = [
-    { id: 1, occupied: false }, { id: 6, occupied: true },
-    { id: 2, occupied: true },  { id: 7, occupied: false },
-    { id: 3, occupied: false }, { id: 8, occupied: false },
-    { id: 4, occupied: false }, { id: 9, occupied: true },
-    { id: 5, occupied: true },  { id: 10, occupied: false },
+    { id: 1, occupied: false },
+    { id: 6, occupied: true },
+    { id: 2, occupied: true },
+    { id: 7, occupied: false },
+    { id: 3, occupied: false },
+    { id: 8, occupied: false },
+    { id: 4, occupied: false },
+    { id: 9, occupied: true },
+    { id: 5, occupied: true },
+    { id: 10, occupied: false },
   ];
 
+  const handleSpotPress = (id: number, occupied: boolean) => {
+    // Viaja a la ruta dinámica, pasando el ID en la URL
+    router.push(`/spot/${id}?occupied=${occupied}`);
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Logo y Título */}
         <View style={styles.headerRow}>
           <Ionicons name="car" size={30} color={Colors.primary} />
@@ -40,11 +53,11 @@ export default function Index() {
               <Text style={styles.updateText}>Actualizado hace 2 minutos</Text>
             </View>
           </View>
-          <MaterialIcons 
-            name="directions-car" 
-            size={100} 
-            color="rgba(255,255,255,0.15)" 
-            style={styles.bgIcon} 
+          <MaterialIcons
+            name="directions-car"
+            size={100}
+            color="rgba(255,255,255,0.15)"
+            style={styles.bgIcon}
           />
         </View>
 
@@ -62,24 +75,27 @@ export default function Index() {
         {/* Grid de Espacios (2 columnas) */}
         <View style={styles.grid}>
           {parkingSpots.map((spot) => (
-            <TouchableOpacity 
-              key={spot.id} 
+            <TouchableOpacity
+              key={spot.id}
               activeOpacity={0.7}
+              onPress={() => handleSpotPress(spot.id, spot.occupied)}
               style={[
-                styles.spotCard, 
-                { borderColor: spot.occupied ? Colors.danger : "#10B981" }
+                styles.spotCard,
+                { borderColor: spot.occupied ? Colors.danger : "#10B981" },
               ]}
             >
-              <Text style={[
-                styles.spotNumber, 
-                { color: spot.occupied ? "#94A3B8" : Colors.textPrimary }
-              ]}>
+              <Text
+                style={[
+                  styles.spotNumber,
+                  { color: spot.occupied ? "#94A3B8" : Colors.textPrimary },
+                ]}
+              >
                 {spot.id}
               </Text>
-              <MaterialIcons 
-                name={spot.occupied ? "cancel" : "check-circle"} 
-                size={24} 
-                color={spot.occupied ? Colors.danger : "#10B981"} 
+              <MaterialIcons
+                name={spot.occupied ? "cancel" : "check-circle"}
+                size={24}
+                color={spot.occupied ? Colors.danger : "#10B981"}
               />
             </TouchableOpacity>
           ))}
@@ -88,14 +104,19 @@ export default function Index() {
         {/* Cuadro informativo inferior */}
         <View style={styles.infoBox}>
           <View style={styles.infoIconContainer}>
-            <Ionicons name="information-outline" size={24} color={Colors.primary} />
+            <Ionicons
+              name="information-outline"
+              size={24}
+              color={Colors.primary}
+            />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.infoTitle}>¿Buscas un sitio específico?</Text>
-            <Text style={styles.infoSubtitle}>Toca un número para ver detalles.</Text>
+            <Text style={styles.infoSubtitle}>
+              Toca un número para ver detalles.
+            </Text>
           </View>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
