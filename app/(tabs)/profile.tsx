@@ -1,69 +1,86 @@
 import HeaderSecondary from "@/components/shared/HeaderSecondary";
-import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import { Colors } from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+  ProfileHeader,
+  ProfileItem,
+  ProfileModal,
+  ProfileSection,
+} from "@/components/profile";
+import { useProfileScreen } from "@/hooks/useProfileScreen";
 
-import { Alert } from "react-native"; // Para mostrar errores de forma sencilla
-import { useAuth } from "@/hooks/useAuth"; // Importamos el hook de autenticación
-
-/* Pantalla */
 export default function ProfileScreen() {
-  const [loading, setLoading] = useState(false); // Estado local para el feedback del botón
   const router = useRouter();
-  const { session, user, signOut, exitGuest } = useAuth();
-
-  // Datos reales si hay sesión, fallback si es invitado
-  const displayName = user?.user_metadata?.nombre ?? "Invitado";
-  const displayEmail = user?.email ?? "Sin cuenta";
-
-  const handleLogout = async () => {
-    setLoading(true);
-
-    try {
-      await signOut();
-      exitGuest(); // resetea el modo invitado
-    } catch (error: any) {
-      Alert.alert("No se pudo cerrar la sesión");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = () => {
-    router.replace("/(auth)/login");
-  };
+  const {
+    session,
+    displayName,
+    displayEmail,
+    loading,
+    modalType,
+    modalLoading,
+    modalError,
+    nameInput,
+    emailInput,
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    setNameInput,
+    setEmailInput,
+    setCurrentPassword,
+    setNewPassword,
+    setConfirmPassword,
+    openModal,
+    closeModal,
+    handleLogout,
+    handleUpdateName,
+    handleUpdateEmail,
+    handleUpdatePassword,
+    handleDeleteAccount,
+  } = useProfileScreen();
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <HeaderSecondary title="Perfil de Usuario" />
 
-        <Avatar name={displayName} />
+        <ProfileHeader name={displayName} email={displayEmail} />
 
-        <Text style={styles.name}>{displayName}</Text>
-        <Text style={styles.email}>{displayEmail}</Text>
+        <ProfileSection title="CONFIGURACIÓN">
+          <ProfileItem
+            icon="person-outline"
+            label="Nombre"
+            value={displayName}
+            onPress={() => openModal("editName")}
+          />
+          <ProfileItem
+            icon="mail-outline"
+            label="Correo"
+            value={displayEmail}
+            onPress={() => openModal("editEmail")}
+          />
+          <ProfileItem
+            icon="lock-closed-outline"
+            label="Contraseña"
+            onPress={() => openModal("changePassword")}
+          />
+          <ProfileItem icon="globe-outline" label="Idioma" value="Español" />
+        </ProfileSection>
 
-        <Section title="CONFIGURACIÓN">
-          <Item icon="mail-outline" label="Correo Electrónico" />
-          <Item icon="lock-closed-outline" label="Contraseña" />
-          <Item icon="globe-outline" label="Idioma" value="Español" />
-        </Section>
+        <ProfileSection title="AYUDA">
+          <ProfileItem
+            icon="warning-outline"
+            label="Eliminar Cuenta"
+            onPress={() => openModal("deleteAccount")}
+          />
+          <ProfileItem icon="help-circle-outline" label="Soporte" />
+          <ProfileItem icon="document-text-outline" label="Términos y Condiciones" />
+        </ProfileSection>
 
-        <Section title="AYUDA">
-          <Item icon="help-circle-outline" label="Soporte" />
-          <Item icon="document-text-outline" label="Términos y Condiciones" />
-        </Section>
-        <Section>
+        <ProfileSection>
           {session ? (
             <Button
               title="Cerrar Sesión"
@@ -78,103 +95,50 @@ export default function ProfileScreen() {
             <Button
               title="Iniciar Sesión"
               variant="secondary"
-              onPress={handleLogin}
+              onPress={() => router.replace("/(auth)/login")}
             />
           )}
-        </Section>
+        </ProfileSection>
       </ScrollView>
+
+      <ProfileModal
+        visible={modalType !== null}
+        modalType={modalType}
+        modalError={modalError}
+        modalLoading={modalLoading}
+        nameInput={nameInput}
+        emailInput={emailInput}
+        currentPassword={currentPassword}
+        newPassword={newPassword}
+        confirmPassword={confirmPassword}
+        setNameInput={setNameInput}
+        setEmailInput={setEmailInput}
+        setCurrentPassword={setCurrentPassword}
+        setNewPassword={setNewPassword}
+        setConfirmPassword={setConfirmPassword}
+        onClose={closeModal}
+        onPrimaryAction={() => {
+          switch (modalType) {
+            case "editName":
+              return handleUpdateName();
+            case "editEmail":
+              return handleUpdateEmail();
+            case "changePassword":
+              return handleUpdatePassword();
+            case "deleteAccount":
+              return handleDeleteAccount();
+            default:
+              return;
+          }
+        }}
+      />
     </View>
   );
 }
-
-/* -------- COMPONENTES (luego van en /components) -------- */
-
-const Section = ({ title, children }: any) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <View style={styles.card}>{children}</View>
-  </View>
-);
-
-const Item = ({ icon, label, value }: any) => (
-  <TouchableOpacity style={styles.item}>
-    <View style={styles.itemLeft}>
-      <Ionicons name={icon} size={20} color={Colors.textMuted} />
-      <Text style={styles.itemText}>{label}</Text>
-    </View>
-
-    <View style={styles.itemRight}>
-      {value && <Text style={styles.value}>{value}</Text>}
-      <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
-    </View>
-  </TouchableOpacity>
-);
-
-/* -------- ESTILOS -------- */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-
-  name: {
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-
-  email: {
-    textAlign: "center",
-    color: Colors.textMuted,
-    fontWeight: "600",
-    marginBottom: 20,
-  },
-
-  section: {
-    paddingHorizontal: 16,
-    marginTop: 16,
-  },
-
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "400",
-    color: Colors.textMuted,
-    marginBottom: 8,
-    letterSpacing: 1,
-  },
-
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-  },
-
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 14,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
-
-  itemLeft: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
-
-  itemRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-
-  itemText: {
-    fontSize: 14,
-  },
-
-  value: {
-    color: Colors.textMuted,
   },
 });
