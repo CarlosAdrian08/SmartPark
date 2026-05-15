@@ -5,28 +5,60 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+import { useAuth } from "@/hooks/useAuth";
+import { Alert } from "react-native";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { signUp } = useAuth(); // ← hook
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false); // ← nuevo
 
-  const handleRegister = () => {
-    console.log("Crear cuenta", { fullName, email, password });
+  const handleRegister = async () => {
+    // Validaciones
+    if (!fullName || !email || !password || !confirmPassword) {
+      Alert.alert("Campos incompletos", "Por favor llena todos los campos.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden.");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await signUp(email, password, fullName);
+      Alert.alert(
+        "¡Registro exitoso!",
+        "Revisa tu correo para confirmar tu cuenta.",
+        [{ text: "OK", onPress: () => router.replace("/(auth)/login") }],
+      );
+    } catch (error: any) {
+      Alert.alert("Error al registrarse", error.message || "Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoToLogin = () => {
@@ -46,7 +78,11 @@ export default function RegisterScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={Colors.textSecondary} />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={Colors.textSecondary}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>SmartPark</Text>
         </View>
@@ -80,6 +116,7 @@ export default function RegisterScreen() {
                 value={fullName}
                 onChangeText={setFullName}
                 iconName="person-outline"
+                editable={!loading}
               />
 
               <Input
@@ -90,6 +127,7 @@ export default function RegisterScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 iconName="mail-outline"
+                editable={!loading}
               />
 
               <Input
@@ -99,6 +137,7 @@ export default function RegisterScreen() {
                 onChangeText={setPassword}
                 isPassword
                 iconName="lock-closed-outline"
+                editable={!loading}
               />
 
               <Input
@@ -108,6 +147,7 @@ export default function RegisterScreen() {
                 onChangeText={setConfirmPassword}
                 isPassword
                 iconName="checkmark-circle-outline"
+                editable={!loading}
               />
 
               <Button
@@ -119,6 +159,8 @@ export default function RegisterScreen() {
                 iconPosition="right"
                 iconColor="#fff"
                 style={styles.registerButton}
+                loading={loading}
+                disabled={loading}
               />
 
               {/* Terms */}
