@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -13,18 +13,30 @@ import {
   View,
 } from "react-native";
 
+import { Alert } from "react-native"; // Para mostrar errores de forma sencilla
+import { useAuth } from "@/hooks/useAuth"; // Importamos el hook de autenticación
+
 /* Pantalla */
 export default function ProfileScreen() {
+  const [loading, setLoading] = useState(false); // Estado local para el feedback del botón
   const router = useRouter();
-  // aquí iría useAuth()
-  const user = {
-    name: "Juan Pérez",
-    email: "juan.perez@email.com",
-  };
+  const { user, signOut, exitGuest } = useAuth();
 
-  const handleLogout = () => {
-    console.log("Cerrando sesión...");
-    router.replace("/(auth)/login");
+  // Datos reales si hay sesión, fallback si es invitado
+  const displayName = user?.user_metadata?.nombre ?? "Invitado";
+  const displayEmail = user?.email ?? "Sin cuenta";
+
+  const handleLogout = async () => {
+    setLoading(true);
+
+    try {
+      await signOut();
+      exitGuest(); // resetea el modo invitado
+    } catch (error: any) {
+      Alert.alert("No se pudo cerrar la sesión");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,10 +44,10 @@ export default function ProfileScreen() {
       <ScrollView>
         <HeaderSecondary title="Perfil de Usuario" />
 
-        <Avatar name={user.name} />
+        <Avatar name={displayName} />
 
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Text style={styles.name}>{displayName}</Text>
+        <Text style={styles.email}>{displayEmail}</Text>
 
         <Section title="CONFIGURACIÓN">
           <Item icon="mail-outline" label="Correo Electrónico" />
@@ -49,11 +61,13 @@ export default function ProfileScreen() {
         </Section>
         <Section>
           <Button
-            title="Cerrar Sesión"
+            title={loading ? "Cerrando sesión ..." : "Cerrar Sesión"}
             variant="danger"
             iconName="logout"
             iconColor="red"
             onPress={handleLogout}
+            loading={loading}
+            disabled={loading}
           />
         </Section>
       </ScrollView>
