@@ -20,7 +20,7 @@ import { useAuth } from "@/hooks/useAuth"; // Importamos el hook de autenticaci�
 export default function ProfileScreen() {
   const [loading, setLoading] = useState(false); // Estado local para el feedback del botón
   const router = useRouter();
-  const { user, signOut, exitGuest } = useAuth();
+  const { session, user, signOut, exitGuest } = useAuth();
 
   // Datos reales si hay sesión, fallback si es invitado
   const displayName = user?.user_metadata?.nombre ?? "Invitado";
@@ -37,6 +37,10 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogin = () => {
+    router.replace("/(auth)/login");
   };
 
   return (
@@ -60,15 +64,23 @@ export default function ProfileScreen() {
           <Item icon="document-text-outline" label="Términos y Condiciones" />
         </Section>
         <Section>
-          <Button
-            title={loading ? "Cerrando sesión ..." : "Cerrar Sesión"}
-            variant="danger"
-            iconName="logout"
-            iconColor="red"
-            onPress={handleLogout}
-            loading={loading}
-            disabled={loading}
-          />
+          {session ? (
+            <Button
+              title="Cerrar Sesión"
+              variant="danger"
+              iconName="logout"
+              iconColor="red"
+              onPress={handleLogout}
+              loading={loading}
+              disabled={loading}
+            />
+          ) : (
+            <Button
+              title="Iniciar Sesión"
+              variant="secondary"
+              onPress={handleLogin}
+            />
+          )}
         </Section>
       </ScrollView>
     </View>
