@@ -1,15 +1,7 @@
-import { Text, View } from "react-native";
+import { Redirect } from "expo-router";
+import React from "react";
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Hola Mundo.</Text>
-    </View>
-  );
+export default function StartScreen() {
+  // Redirige automáticamente a la ruta de Login al abrir la app
+  return <Redirect href="/(auth)/login" />;
 }
