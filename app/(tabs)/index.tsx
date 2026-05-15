@@ -1,36 +1,30 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import {
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constants/Colors"; // Ajustado según tu captura de archivos
+import { Colors } from "@/constants/Colors";
+
+import Callout from "@/components/ui/Callout";
+import Logo from "@/components/ui/Logo";
+
+import { SpotGrid } from "@/components/parking/SpotGrid";
+import { useSpots } from "@/hooks/useSpots";
 
 export default function Index() {
   const router = useRouter();
-  // Simulación de los 10 espacios de la imagen
-  const parkingSpots = [
-    { id: 1, occupied: false },
-    { id: 6, occupied: true },
-    { id: 2, occupied: true },
-    { id: 7, occupied: false },
-    { id: 3, occupied: false },
-    { id: 8, occupied: false },
-    { id: 4, occupied: false },
-    { id: 9, occupied: true },
-    { id: 5, occupied: true },
-    { id: 10, occupied: false },
-  ];
+  const { spots, porZona, loading, error } = useSpots();
 
-  const handleSpotPress = (id: number, occupied: boolean) => {
-    // Viaja a la ruta dinámica, pasando el ID en la URL
-    router.push(`/spot/${id}?occupied=${occupied}`);
-  };
+  const occupiedCount = spots.filter(
+    (spot) => spot.estado === "Ocupado",
+  ).length;
+  const totalCount = spots.length;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -38,16 +32,17 @@ export default function Index() {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Logo y Título */}
-        <View style={styles.headerRow}>
-          <Ionicons name="car" size={30} color={Colors.primary} />
-          <Text style={styles.brandText}>SmartPark</Text>
-        </View>
+        <Logo />
 
         {/* Tarjeta de Resumen */}
         <View style={styles.statusCard}>
           <View>
-            <Text style={styles.statusLabel}>ESTADO ACTUAL</Text>
-            <Text style={styles.statusMain}>6/10 spots</Text>
+            <Text style={styles.statusLabel}>ESTADO ACTUAL DE LOS CAJONES</Text>
+            <Text style={styles.statusMain}>
+              {loading
+                ? "Cargando..."
+                : `${occupiedCount}/${totalCount} Ocupados`}
+            </Text>
             <View style={styles.updateRow}>
               <MaterialIcons name="access-time" size={14} color="#fff" />
               <Text style={styles.updateText}>Actualizado hace 2 minutos</Text>
@@ -72,51 +67,50 @@ export default function Index() {
           </View>
         </View>
 
-        {/* Grid de Espacios (2 columnas) */}
-        <View style={styles.grid}>
-          {parkingSpots.map((spot) => (
-            <TouchableOpacity
-              key={spot.id}
-              activeOpacity={0.7}
-              onPress={() => handleSpotPress(spot.id, spot.occupied)}
-              style={[
-                styles.spotCard,
-                { borderColor: spot.occupied ? Colors.danger : "#10B981" },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.spotNumber,
-                  { color: spot.occupied ? "#94A3B8" : Colors.textPrimary },
-                ]}
-              >
-                {spot.id}
-              </Text>
-              <MaterialIcons
-                name={spot.occupied ? "cancel" : "check-circle"}
-                size={24}
-                color={spot.occupied ? Colors.danger : "#10B981"}
-              />
-            </TouchableOpacity>
-          ))}
+        {loading && (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <ActivityIndicator />
+            <Text style={{ marginTop: 8 }}>Cargando cajones...</Text>
+          </View>
+        )}
+
+        {error && (
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+            }}
+          >
+            <Text style={{ color: "#DC2626", fontWeight: "700" }}>
+              Error cargando tablero
+            </Text>
+            <Text style={{ marginTop: 8, color: "#6B7280" }}>
+              {String(error)}
+            </Text>
+          </View>
+        )}
+
+        <View style={{ flex: 1, backgroundColor: "#F3F4F6" }}>
+          <SpotGrid
+            porZona={porZona}
+            onPressSpot={(spot) =>
+              router.push(
+                `/spot/${spot.codigo}?occupied=${spot.estado === "Ocupado"}`,
+              )
+            }
+          />
         </View>
 
         {/* Cuadro informativo inferior */}
-        <View style={styles.infoBox}>
-          <View style={styles.infoIconContainer}>
-            <Ionicons
-              name="information-outline"
-              size={24}
-              color={Colors.primary}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.infoTitle}>¿Buscas un sitio específico?</Text>
-            <Text style={styles.infoSubtitle}>
-              Toca un número para ver detalles.
-            </Text>
-          </View>
-        </View>
+        <Callout
+          title="¿Buscas un sitio específico?"
+          subtitle="Toca un número para ver detalles."
+          iconName="help-circle-outline"
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -131,17 +125,6 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 40,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    gap: 10,
-  },
-  brandText: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: Colors.primary,
-  },
   statusCard: {
     backgroundColor: Colors.primary,
     borderRadius: 20,
@@ -149,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    overflow: "hidden", // Para el icono de fondo
+    overflow: "hidden",
     marginBottom: 32,
   },
   statusLabel: {
@@ -204,48 +187,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textMuted,
     marginRight: 4,
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  spotCard: {
-    width: "48%", // Casi la mitad para dejar espacio al gap
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    padding: 18,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1.5,
-    marginBottom: 12,
-  },
-  spotNumber: {
-    fontSize: 24,
-    fontWeight: "800",
-  },
-  infoBox: {
-    backgroundColor: "#EBF8FF",
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-    marginTop: 20,
-  },
-  infoIconContainer: {
-    backgroundColor: "#D1E9F6",
-    padding: 10,
-    borderRadius: 12,
-  },
-  infoTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: Colors.textPrimary,
-  },
-  infoSubtitle: {
-    fontSize: 13,
-    color: Colors.textMuted,
   },
 });
