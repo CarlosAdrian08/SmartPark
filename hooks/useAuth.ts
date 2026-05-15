@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/utils/supabase";
 import { useAuthStore } from "@/store/auth.store";
+import { supabase } from "@/utils/supabase";
+import { Session, User } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -37,6 +37,17 @@ export function useAuth() {
     signIn: authService.signIn,
     signUp: authService.signUp,
     signOut: authService.signOut,
+    updateProfile: authService.updateProfile,
+    profileExists: authService.profileExists,
+    updateEmail: authService.updateEmail,
+    updatePassword: authService.updatePassword,
+    deleteAccount: authService.deleteAccount,
+    refreshSession: async () => {
+      const session = await authService.getSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+      return session;
+    },
     enterAsGuest: () => setGuestMode(true),
     exitGuest: () => setGuestMode(false),
   };
