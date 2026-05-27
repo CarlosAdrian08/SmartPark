@@ -44,9 +44,8 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
+      <HeaderSecondary title="Perfil de Usuario" />
       <ScrollView>
-        <HeaderSecondary title="Perfil de Usuario" />
-
         <ProfileHeader name={displayName} email={displayEmail} />
 
         <ProfileSection title="CONFIGURACIÓN">
@@ -77,7 +76,10 @@ export default function ProfileScreen() {
             onPress={() => openModal("deleteAccount")}
           />
           <ProfileItem icon="help-circle-outline" label="Soporte" />
-          <ProfileItem icon="document-text-outline" label="Términos y Condiciones" />
+          <ProfileItem
+            icon="document-text-outline"
+            label="Términos y Condiciones"
+          />
         </ProfileSection>
 
         <ProfileSection>
@@ -99,6 +101,9 @@ export default function ProfileScreen() {
             />
           )}
         </ProfileSection>
+
+        {/* Espaciado */}
+        <View style={{ height: 24 }} />
       </ScrollView>
 
       <ProfileModal
