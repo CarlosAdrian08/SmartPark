@@ -20,6 +20,7 @@ export function SpotCard({
         borderRadius: 12,
         padding: 18,
         flexDirection: "row",
+        gap: 4,
         justifyContent: "space-between",
         alignItems: "center",
         borderWidth: 1.5,
@@ -27,10 +28,10 @@ export function SpotCard({
         borderColor: spot.estado === "Ocupado" ? Colors.danger : "#10B981",
       }}
     >
-      <View style={{ gap: 6 }}>
+      <View style={{ gap: 4 }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: 16,
             fontWeight: "800",
             color: spot.estado === "Ocupado" ? "#94A3B8" : Colors.textPrimary,
           }}
@@ -42,7 +43,7 @@ export function SpotCard({
 
       <MaterialIcons
         name={spot.estado === "Ocupado" ? "cancel" : "check-circle"}
-        size={24}
+        size={16}
         color={spot.estado === "Ocupado" ? Colors.danger : "#10B981"}
       />
     </Pressable>

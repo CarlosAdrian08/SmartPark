@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: Colors.surface,
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-    marginBottom: 16,
   },
 
   headerTitle: {

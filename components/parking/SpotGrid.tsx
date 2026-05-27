@@ -22,7 +22,7 @@ export function SpotGrid({
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {porZona[zona].map((spot) => (
-              <View key={spot.id} style={{ width: "50%" }}>
+              <View key={spot.id} style={{ width: "33%" }}>
                 <SpotCard spot={spot} onPress={() => onPressSpot?.(spot)} />
               </View>
             ))}
