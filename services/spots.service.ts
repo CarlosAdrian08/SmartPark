@@ -7,7 +7,7 @@ export async function getSpotsRealtimeInitial(): Promise<FetchResult> {
   const { data, error } = await supabase
     .from("cajon")
     .select("id, codigo, zona, estado:estado_cajon(nombre)")
-    .order("zona", { ascending: true });
+    .order("codigo", { ascending: true });
 
   if (error) throw error;
 
